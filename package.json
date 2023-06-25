@@ -4,7 +4,9 @@
   "description": "Multi-Factor Deterministic Password Generator (MFDPG)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run style && npm run unit",
+    "unit": "mocha",
+    "style": "standard --fix"
   },
   "repository": {
     "type": "git",
@@ -19,5 +21,16 @@
   "bugs": {
     "url": "https://github.com/multifactor/mfdpg/issues"
   },
-  "homepage": "https://github.com/multifactor/mfdpg#readme"
+  "homepage": "https://github.com/multifactor/mfdpg#readme",
+  "dependencies": {
+    "bloom-filters": "^3.0.0",
+    "hash-wasm": "^4.9.0",
+    "mfkdf": "^0.10.0",
+    "randexp": "^0.5.3"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "standard": "^17.1.0"
+  }
 }
