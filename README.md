@@ -11,3 +11,32 @@ In doing so, MFDPG has the further effect of progressively upgrading any passwor
 
 #### Getting Started
 To get started, clone this repository, then install all of the required dependencies using `npm install`. You can run our unit testing suite with `npm test`. For detailed API documentation, see [DOCS.md](DOCS.md).
+
+#### Working Example
+The below working example demonstrates the basic functions of multi-factor authentication, portability, revocation, and password generation based on regular expressions.
+
+```js
+// Create new MFDPG instance with two authentication factors
+const generator1 = await new MFDPG([
+  await mfkdf.setup.factors.password('password'),
+  await mfkdf.setup.factors.hotp({ secret: Buffer.from('hello world') })
+])
+// Create a password for a website using a regular expression
+const policy = /([A-Za-z]+[0-9]|[0-9]+[A-Za-z])[A-Za-z0-9]*/
+const password1 = await generator1.generate('example.com', policy)
+// Revoke the password and try again
+await generator1.revoke('example.com')
+const password2 = await generator1.generate('example.com', policy)
+password1.should.not.equal(password2) // assert -> true
+// Save your public parameters and "log out"
+const material = generator1.export()
+
+// Log back in using a password and HOTP code
+const generator2 = await MFDPG.import(material, {
+  password: mfkdf.derive.factors.password('password'),
+  hotp: mfkdf.derive.factors.hotp(365287)
+})
+// Regenerate the same password for the same website
+const password3 = await generator2.generate('example.com', policy)
+password2.should.equal(password3) // assert -> true
+```

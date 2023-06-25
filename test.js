@@ -22,6 +22,47 @@ suite('mfdpg', () => {
     })
     generator1.key.toString('hex').should.equal(generator2.key.toString('hex'))
   })
+
+  test('multi-factor-authentication', async () => {
+    const generator1 = await new MFDPG([
+      await mfkdf.setup.factors.password('password'),
+      await mfkdf.setup.factors.hotp({ secret: Buffer.from('hello world') }),
+      await mfkdf.setup.factors.uuid({ uuid: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d' })
+    ])
+    const material = generator1.export()
+    const generator2 = await MFDPG.import(material, {
+      password: mfkdf.derive.factors.password('password'),
+      hotp: mfkdf.derive.factors.hotp(365287),
+      uuid: mfkdf.derive.factors.uuid('9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d')
+    })
+    generator1.key.toString('hex').should.equal(generator2.key.toString('hex'))
+  })
+
+  test('full-example', async () => {
+    // Create new MFDPG instance with two authentication factors
+    const generator1 = await new MFDPG([
+      await mfkdf.setup.factors.password('password'),
+      await mfkdf.setup.factors.hotp({ secret: Buffer.from('hello world') })
+    ])
+    // Create a password for a website using a regular expression
+    const policy = /([A-Za-z]+[0-9]|[0-9]+[A-Za-z])[A-Za-z0-9]*/
+    const password1 = await generator1.generate('example.com', policy)
+    // Revoke the password and try again
+    await generator1.revoke('example.com')
+    const password2 = await generator1.generate('example.com', policy)
+    password1.should.not.equal(password2) // assert -> true
+    // Save your public parameters and "log out"
+    const material = generator1.export()
+
+    // Log back in using a password and HOTP code
+    const generator2 = await MFDPG.import(material, {
+      password: mfkdf.derive.factors.password('password'),
+      hotp: mfkdf.derive.factors.hotp(365287)
+    })
+    // Regenerate the same password for the same website
+    const password3 = await generator2.generate('example.com', policy)
+    password2.should.equal(password3) // assert -> true
+  })
 })
 
 suite('correctness', () => {
