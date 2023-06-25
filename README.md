@@ -10,4 +10,4 @@ It also implements unique algorithmic solutions for password policy compliance a
 In doing so, MFDPG has the further effect of progressively upgrading any password-based website to support strong MFA.
 
 #### Getting Started
-To get started, clone this repository, then install all of the required dependencies using `npm install`. You can run our unit testing suite with `npm test`.
+To get started, clone this repository, then install all of the required dependencies using `npm install`. You can run our unit testing suite with `npm test`. For detailed API documentation, see [DOCS.md](DOCS.md).

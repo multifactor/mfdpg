@@ -6,7 +6,8 @@
   "scripts": {
     "test": "npm run style && npm run unit",
     "unit": "mocha",
-    "style": "standard --fix"
+    "style": "standard --fix",
+    "docs": "jsdoc2md --no-cache index.js > DOCS.md"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
   "dependencies": {
     "bloom-filters": "^3.0.0",
     "hash-wasm": "^4.9.0",
+    "jsdoc-to-markdown": "^8.0.0",
     "mfkdf": "^1.4.6",
     "randexp": "^0.5.3",
     "random-seed": "^0.3.0"

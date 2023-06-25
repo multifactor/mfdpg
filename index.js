@@ -1,3 +1,8 @@
+/**
+ * @file Multi-Factor Deterministic Password Generator (MFDPG)
+ * @copyright Multifactor 2023
+ */
+
 const mfkdf = require('mfkdf')
 const { CuckooFilter } = require('bloom-filters')
 const { createHash } = require('crypto')
@@ -8,7 +13,19 @@ const rand = require('random-seed')
 const MAX_REVOCATIONS = 4096
 const TARGET_FP_RATE = 0.0001
 
+/**
+ * An instance of a Multi-Factor Deterministic Password Generator (MFDPG).
+ *
+ * @typicalname mfdpg
+ */
+
 class MFDPG {
+  /**
+   * Create a brand new MFDPG instance from a series of authentication factors.
+   *
+   * @param {Array.<MFKDFFactor>} factors - Set of factors for this key.
+   * @returns {MFDPG} The newly created MFDPG instance.
+   */
   constructor (factors) {
     if (!factors) return
 
@@ -30,6 +47,11 @@ class MFDPG {
     })
   }
 
+  /**
+   * Export this MFDPG instance for future use.
+   *
+   * @returns {Object} The exported public parameters from this MFDPG instance.
+   */
   export () {
     return {
       policy: this.policy,
@@ -37,6 +59,13 @@ class MFDPG {
     }
   }
 
+  /**
+   * Create an MFDPG instance from a previously exported instance.
+   *
+   * @param {Object} object - The previously exported public parameters.
+   * @param {Object} factors - The MFKDF factors for recovering the key.
+   * @returns {MFDPG} The imported MFDPG instance.
+   */
   static async import (object, factors) {
     const dpg = new MFDPG()
     dpg.revocations = CuckooFilter.fromJSON(object.filter)
@@ -46,6 +75,12 @@ class MFDPG {
     return dpg
   }
 
+  /**
+   * Directly add a hashable object to the Cuckoo filter.
+   * Removes a fictitious entry to keep the number of entries constant.
+   *
+   * @param {HashableInput} hash - The object to hash and add to the filter.
+   */
   revokeKey (hash) {
     this.revocations.add(hash)
     const key = this.key.toString('hex')
@@ -58,10 +93,21 @@ class MFDPG {
     }
   }
 
+  /**
+   * Check whether a hashable object is in the Cuckoo filter.
+   *
+   * @param {HashableInput} hash - The object to hash and check.
+   * @returns {Boolean} Whether the hash might be in the filter.
+   */
   check (hash) {
     return this.revocations.has(hash)
   }
 
+  /**
+   * Add a service to the revocation list using its domain name.
+   *
+   * @param {string} domain - The domain name of the service to revoke.
+   */
   async revoke (domain) {
     let counter = 0
     let preimage
@@ -80,6 +126,13 @@ class MFDPG {
     this.revokeKey(preimage)
   }
 
+  /**
+   * Generate a password for a given service.
+   *
+   * @param {string} domain - The domain name of the service.
+   * @param {RegExp} regex - The password policy of the service.
+   * @returns {string} The generated password for the target service.
+   */
   async generate (domain, regex) {
     let counter = 0
     let preimage
