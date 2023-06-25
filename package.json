@@ -1,0 +1,23 @@
+{
+  "name": "mfdpg",
+  "version": "1.0.0",
+  "description": "Multi-Factor Deterministic Password Generator (MFDPG)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/multifactor/mfdpg.git"
+  },
+  "keywords": [
+    "DPG",
+    "MFKDF"
+  ],
+  "author": "Multifactor",
+  "license": "BSD-3-Clause-Clear",
+  "bugs": {
+    "url": "https://github.com/multifactor/mfdpg/issues"
+  },
+  "homepage": "https://github.com/multifactor/mfdpg#readme"
+}
